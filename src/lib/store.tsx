@@ -15,10 +15,10 @@ export type Product = {
   description: string;
   price: number;
   billing: Billing;
-  photo?: string;
+  photo?: string | undefined;
   available: boolean;
 };
-export type Client = { id: string; name: string; phone: string; email?: string; notes?: string };
+export type Client = { id: string; name: string; phone: string; email?: string | undefined; notes?: string | undefined };
 export type RentalStatus = "andamento" | "aguardando" | "finalizada" | "atrasada";
 export type Rental = {
   id: string;

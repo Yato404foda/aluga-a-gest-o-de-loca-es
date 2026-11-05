@@ -58,18 +58,18 @@ function Choice<T extends string>({ options, value, onChange }: { options: { v: 
 
 const ok = (msg: string) => toast.success(msg, { icon: <CheckCircle2 className="h-5 w-5" /> });
 
-export function ProductForm({ open, onOpenChange, product }: { open: boolean; onOpenChange: (o: boolean) => void; product?: Product }) {
+export function ProductForm({ open, onOpenChange, product }: { open: boolean; onOpenChange: (o: boolean) => void; product?: Product | undefined }) {
   const { addProduct, updateProduct } = useStore();
-  const empty = { name: "", category: CATEGORIES[0], description: "", price: "", billing: "diária" as Billing, available: "sim" as "sim" | "nao", photo: undefined as string | undefined };
+  const empty = { name: "", category: CATEGORIES[0] as string, description: "", price: "", billing: "diária" as Billing, available: "sim" as "sim" | "nao", photo: undefined as string | undefined };
   const [f, setF] = useState(empty);
   useEffect(() => {
-    if (open) setF(product ? { ...product, price: String(product.price), available: product.available ? "sim" : "nao" } : empty);
+    if (open) setF(product ? { name: product.name, category: product.category, description: product.description, billing: product.billing, photo: product.photo, price: String(product.price), available: product.available ? "sim" : "nao" } : empty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, product]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!f.name || !f.price) return toast.error("Preencha o nome e o valor do produto.");
+    if (!f.name || !f.price) { toast.error("Preencha o nome e o valor do produto."); return; }
     const data = { name: f.name, category: f.category, description: f.description, price: Number(f.price), billing: f.billing, available: f.available === "sim", photo: f.photo };
     if (product) { updateProduct({ ...data, id: product.id }); ok("Produto atualizado com sucesso!"); }
     else { addProduct(data); ok("Produto cadastrado com sucesso!"); }
@@ -117,7 +117,7 @@ export function ClientForm({ open, onOpenChange }: { open: boolean; onOpenChange
   useEffect(() => { if (open) setF({ name: "", phone: "", email: "", notes: "" }); }, [open]);
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!f.name || !f.phone) return toast.error("Preencha o nome e o telefone.");
+    if (!f.name || !f.phone) { toast.error("Preencha o nome e o telefone.");
     addClient({ name: f.name, phone: f.phone, email: f.email || undefined, notes: f.notes || undefined });
     ok("Cliente cadastrado com sucesso!");
     onOpenChange(false);
@@ -144,8 +144,8 @@ export function RentalForm({ open, onOpenChange }: { open: boolean; onOpenChange
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!f.clientId || !f.productId || !f.end) return toast.error("Escolha o cliente, o produto e as datas.");
-    if (f.end < f.start) return toast.error("A devolução precisa ser depois da retirada.");
+    if (!f.clientId || !f.productId || !f.end) { toast.error("Escolha o cliente, o produto e as datas.");
+    if (f.end < f.start) { toast.error("A devolução precisa ser depois da retirada.");
     const total = Number(f.total) || suggested || 0;
     addRental({ clientId: f.clientId, productId: f.productId, start: f.start, end: f.end, total, status: f.start > TODAY ? "aguardando" : "andamento", paid: false });
     ok("Locação registrada com sucesso!");
